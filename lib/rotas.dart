@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:whatsappweb/models/usuario.dart';
 import 'package:whatsappweb/screens/home.dart';
 import 'package:whatsappweb/screens/login.dart';
+import 'package:whatsappweb/screens/mensagens.dart';
 
 class Rotas {
   static Route<dynamic> gerarRota(RouteSettings settings) {
@@ -13,6 +15,8 @@ class Rotas {
         return MaterialPageRoute(builder: (_) => const Login());
       case "/home":
         return MaterialPageRoute(builder: (_) => const Home());
+      case "/mensagens":
+        return MaterialPageRoute(builder: (_) => Mensagens(args as Usuario));
     }
     return _errorRota();
   }
