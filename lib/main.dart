@@ -1,9 +1,18 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:whatsappweb/rotas.dart';
 import 'package:whatsappweb/utils/paleta_cores.dart';
 
 void main() {
+  String rota = "/";
+
+  User? usuarioLogado = FirebaseAuth.instance.currentUser;
+
+  if (usuarioLogado != null) {
+    rota = "/home";
+  }
+
   runApp(
     MaterialApp(
       title: 'WhatsAppWeb',
@@ -12,7 +21,7 @@ void main() {
           primaryColor: PaletaCores.corPrimaria,
           appBarTheme:
               const AppBarTheme(backgroundColor: PaletaCores.corPrimaria)),
-      initialRoute: "/login",
+      initialRoute: rota,
       onGenerateRoute: Rotas.gerarRota,
     ),
   );
