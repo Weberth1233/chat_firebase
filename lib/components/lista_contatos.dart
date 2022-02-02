@@ -14,25 +14,37 @@ class ListaContatos extends StatefulWidget {
 class _ListaContatosState extends State<ListaContatos> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-
+  List<String> ids = [];
   late String _idUsuarioLogado;
+  bool algumaMensagem = false;
 
   Future<List<Usuario>> _recuperarContatos() async {
     //usuarioRef recebe a coleção usuarios nomeada no firestore
     final usuarioRef = _firestore.collection("usuarios");
 
     QuerySnapshot querySnapshot = await usuarioRef.get();
+
     List<Usuario> listaUsuarios = [];
     for (DocumentSnapshot item in querySnapshot.docs) {
       String idUsuario = item["idUsuario"];
       //Para não lista o proprio usuario logado na aplicação
       if (idUsuario == _idUsuarioLogado) continue;
       //Ca
+
       Usuario usuario = Usuario(idUsuario, item["nome"], item["email"],
           urlImagem: item["urlImagem"]);
       listaUsuarios.add(usuario);
     }
     return listaUsuarios;
+  }
+
+  _novasMensagens(String idContatos) {
+    final mensagensRef = _firestore
+        .collection("mensagem")
+        .doc(_idUsuarioLogado)
+        .collection(idContatos)
+        .id;
+    ids.add(mensagensRef);
   }
 
   _recuperarDadosUsuarioLogado() async {
