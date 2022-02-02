@@ -27,12 +27,12 @@ class _LoginState extends State<Login> {
 
   Uint8List? _imagemSelecionada;
 
-  _verificarUsuarioLogado() {
+  /*_verificarUsuarioLogado() {
     User? usuarioLogado = _auth.currentUser;
     if (usuarioLogado != null) {
       Navigator.pushReplacementNamed(context, "/home");
     }
-  }
+  }*/
 
   _selecionarImagem() async {
     //Selecionar Imagem
@@ -55,17 +55,19 @@ class _LoginState extends State<Login> {
         String linkImagem = await uploadTask.snapshot.ref.getDownloadURL();
         //Finalizando a inserção dos dados do usuario inserindo o url de sua imagem salva
         usuario.urlImagem = linkImagem;
+        await _auth.currentUser?.updateDisplayName(usuario.nome);
+        await _auth.currentUser?.updatePhotoURL(usuario.urlImagem);
 
         //Criando coleção de usuario no firebase
-        final usuariosRef = _firestore.collection("usuarios");
-        //.doc identificador do doc
-        //.set é necessário criar um map de usuario
-        //.then ao finalizar execute isso
-        usuariosRef
+        final usuariosRef = _firestore
+            .collection("usuarios")
             .doc(usuario.idUsuario)
             .set(usuario.toMap())
             //Ao finalizar então retorne a route /home
             .then((value) => Navigator.pushReplacementNamed(context, "/home"));
+        //.doc identificador do doc
+        //.set é necessário criar um map de usuario
+        //.then ao finalizar execute isso
       });
     }
   }
@@ -114,11 +116,11 @@ class _LoginState extends State<Login> {
     }
   }
 
-  @override
+  /*@override
   void initState() {
     super.initState();
-    _verificarUsuarioLogado();
-  }
+    //_verificarUsuarioLogado();
+  }*/
 
   @override
   Widget build(BuildContext context) {
