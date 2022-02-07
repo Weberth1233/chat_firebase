@@ -1,8 +1,7 @@
 import 'dart:async';
-import 'dart:html';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:whatsappweb/models/conversa.dart';
 import 'package:whatsappweb/models/mensagem.dart';
 import 'package:whatsappweb/models/usuario.dart';
 import 'package:whatsappweb/utils/paleta_cores.dart';
@@ -33,6 +32,7 @@ class _ListaMensagensState extends State<ListaMensagens> {
   final StreamController _streamController =
       StreamController<QuerySnapshot>.broadcast();
   late StreamSubscription _streamMensagens;
+  final ScrollController _scrollController = ScrollController();
 
   //Para enviar mensagem é necessário possuir o destinatario e o remetente da mensagem
   _enviarMensagens() {
@@ -44,10 +44,39 @@ class _ListaMensagensState extends State<ListaMensagens> {
       //Salvando Mensagem para que o usuario remetente visualize as mensagens ao qual enviou
       String idUsuarioDestinatario = _usuarioDestinatario.idUsuario;
       _salvarMensagem(idUsuarioRemetente, idUsuarioDestinatario, mensagem);
+      //Salvando Conversa para o usuario logado
+      Conversa conversaRemetente = Conversa(
+          idUsuarioRemetente,
+          idUsuarioDestinatario,
+          mensagem.texto,
+          _usuarioDestinatario.nome,
+          _usuarioDestinatario.email,
+          _usuarioDestinatario.urlImagem);
+      _salvarConversa(conversaRemetente);
 
       //Salvando para o usuario destinatario para que esta possa visualizar as mensagens ao qual recebeu
       _salvarMensagem(idUsuarioDestinatario, idUsuarioRemetente, mensagem);
+      //Salvando conversar para a pessoa que o usuario logado está conversando
+      Conversa conversaDestinatario = Conversa(
+          idUsuarioDestinatario,
+          idUsuarioRemetente,
+          mensagem.texto,
+          _usuarioRemetente.nome,
+          _usuarioRemetente.email,
+          _usuarioRemetente.urlImagem);
+      _salvarConversa(conversaDestinatario);
     }
+  }
+
+  _salvarConversa(Conversa conversa) {
+    //O remetente possui uma coleção de usuarios ao qual o mesmo mandou mensagens
+    _firestore
+        .collection("conversas")
+        //A partir do usuario remetente é buscando a lista de conversas
+        .doc(conversa.idRemetente)
+        .collection('ultimas_mensagens')
+        .doc(conversa.idDestinatario)
+        .set(conversa.toMap());
   }
 
   _salvarMensagem(
@@ -72,6 +101,9 @@ class _ListaMensagensState extends State<ListaMensagens> {
     //Percorrendo o stream e passando para o stremController
     _streamMensagens = stream.listen((dados) {
       _streamController.add(dados);
+      Timer(const Duration(seconds: 1), () {
+        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+      });
     });
   }
 
@@ -83,6 +115,7 @@ class _ListaMensagensState extends State<ListaMensagens> {
 
   @override
   void dispose() {
+    _scrollController.dispose();
     _streamMensagens.cancel();
     super.dispose();
   }
@@ -134,6 +167,7 @@ class _ListaMensagensState extends State<ListaMensagens> {
                           querySnapshot.docs.toList();
                       return Expanded(
                           child: ListView.builder(
+                              controller: _scrollController,
                               itemCount: querySnapshot.docs.length,
                               itemBuilder: (context, indice) {
                                 DocumentSnapshot mensagem =

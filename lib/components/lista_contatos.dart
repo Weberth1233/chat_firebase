@@ -16,7 +16,6 @@ class _ListaContatosState extends State<ListaContatos> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   List<String> ids = [];
   late String _idUsuarioLogado;
-  bool algumaMensagem = false;
 
   Future<List<Usuario>> _recuperarContatos() async {
     //usuarioRef recebe a coleção usuarios nomeada no firestore
@@ -33,18 +32,10 @@ class _ListaContatosState extends State<ListaContatos> {
 
       Usuario usuario = Usuario(idUsuario, item["nome"], item["email"],
           urlImagem: item["urlImagem"]);
+
       listaUsuarios.add(usuario);
     }
     return listaUsuarios;
-  }
-
-  _novasMensagens(String idContatos) {
-    final mensagensRef = _firestore
-        .collection("mensagem")
-        .doc(_idUsuarioLogado)
-        .collection(idContatos)
-        .id;
-    ids.add(mensagensRef);
   }
 
   _recuperarDadosUsuarioLogado() async {
@@ -57,6 +48,7 @@ class _ListaContatosState extends State<ListaContatos> {
   @override
   void initState() {
     super.initState();
+
     _recuperarDadosUsuarioLogado();
   }
 
@@ -96,6 +88,7 @@ class _ListaContatosState extends State<ListaContatos> {
                   itemCount: listaUsuario.length,
                   itemBuilder: (context, index) {
                     Usuario usuario = listaUsuario[index];
+
                     return ListTile(
                       onTap: () {
                         Navigator.pushNamed(context, "/mensagens",
