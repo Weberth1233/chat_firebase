@@ -18,9 +18,9 @@ class _LoginState extends State<Login> {
   bool _visible = false;
   final TextEditingController _controllerName = TextEditingController();
   final TextEditingController _controllerEmail =
-      TextEditingController(text: "weberth20-19@hotmail.com");
+      TextEditingController(text: "weberth20@hotmail.com");
   final TextEditingController _controllerSenha =
-      TextEditingController(text: "escola11");
+      TextEditingController(text: "1234567");
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
