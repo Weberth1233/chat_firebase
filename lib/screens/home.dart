@@ -9,7 +9,7 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      body: Responsivo(mobile: HomeMobile(), web: HomeWeb()),
+      body: Responsivo(mobile: HomeMobile(), tablet: HomeWeb(), web: HomeWeb()),
     );
   }
 }
