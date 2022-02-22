@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:whatsappweb/models/conversa.dart';
 import 'package:whatsappweb/models/mensagem.dart';
 import 'package:whatsappweb/models/usuario.dart';
+import 'package:whatsappweb/provider/conversa_provider.dart';
 import 'package:whatsappweb/utils/paleta_cores.dart';
+import 'package:provider/provider.dart';
 
 class ListaMensagens extends StatefulWidget {
   //Criando os objetos Usuario tanto do remetente quando do destinatario
@@ -107,6 +109,15 @@ class _ListaMensagensState extends State<ListaMensagens> {
     });
   }
 
+  _atualizarListaMensagens() {
+    Usuario? usuarioDestinatario =
+        context.watch<ConversaProvider>().usuarioDestinatario;
+    if (usuarioDestinatario != null) {
+      _usuarioDestinatario = usuarioDestinatario;
+      _recuperarDadosInicias();
+    }
+  }
+
   _recuperarDadosInicias() {
     _usuarioRemetente = widget.usuarioRemetente;
     _usuarioDestinatario = widget.usuarioDestinatario;
@@ -124,6 +135,16 @@ class _ListaMensagensState extends State<ListaMensagens> {
   void initState() {
     super.initState();
     _recuperarDadosInicias();
+  }
+
+  //Atualizar a lista de mensagens para cada usuario
+  //Utilizando o didChange sempre que ouver uma mudança de usuarios
+  //Este metodo entra em ação chamando o atualizarListaMensagem no qual
+  //Faz uma mudança no usuarioDestinatario e novamente roda o _recuperarDados
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _atualizarListaMensagens();
   }
 
   @override

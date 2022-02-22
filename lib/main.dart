@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:whatsappweb/provider/conversa_provider.dart';
 import 'package:whatsappweb/rotas.dart';
 import 'package:whatsappweb/utils/paleta_cores.dart';
 
@@ -14,8 +15,9 @@ void main() {
     rota = "/home";
   }
 
-  runApp(
-    MaterialApp(
+  runApp(ChangeNotifierProvider(
+    create: (context) => ConversaProvider(),
+    child: MaterialApp(
       title: 'WhatsAppWeb',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -25,5 +27,5 @@ void main() {
       initialRoute: rota,
       onGenerateRoute: Rotas.gerarRota,
     ),
-  );
+  ));
 }

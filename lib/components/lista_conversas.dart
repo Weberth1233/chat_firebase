@@ -4,6 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:whatsappweb/models/usuario.dart';
+import 'package:whatsappweb/provider/conversa_provider.dart';
+import 'package:whatsappweb/utils/responsivo.dart';
+import 'package:provider/provider.dart';
 
 class ListaConversas extends StatefulWidget {
   const ListaConversas({Key? key}) : super(key: key);
@@ -61,6 +64,8 @@ class _ListaConversasState extends State<ListaConversas> {
 
   @override
   Widget build(BuildContext context) {
+    bool isWeb = Responsivo.isWeb(context);
+
     return StreamBuilder(
         stream: _streamController.stream,
         builder: (context, snapshot) {
@@ -111,8 +116,15 @@ class _ListaConversasState extends State<ListaConversas> {
 
                     return ListTile(
                       onTap: () {
-                        Navigator.pushNamed(context, "/mensagens",
-                            arguments: usuario);
+                        //Caso seja web utilizar o provider
+                        if (isWeb) {
+                          context.read<ConversaProvider>().usuarioDestinatario =
+                              usuario;
+                        } //Se for mobile exibir uma nova tela para mensagens
+                        else {
+                          Navigator.pushNamed(context, "/mensagens",
+                              arguments: usuario);
+                        }
                       },
                       leading: CircleAvatar(
                         radius: 25,

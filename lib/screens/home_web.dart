@@ -1,8 +1,11 @@
+import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:whatsappweb/components/lista_conversas.dart';
+import 'package:whatsappweb/components/lista_mensagens.dart';
 import 'package:whatsappweb/models/usuario.dart';
+import 'package:whatsappweb/provider/conversa_provider.dart';
 import 'package:whatsappweb/utils/paleta_cores.dart';
 import 'package:whatsappweb/utils/responsivo.dart';
 
@@ -70,7 +73,11 @@ class _HomeWebState extends State<HomeWeb> {
                       child: AreaLateral(
                         usuarioLogado: _usuarioLogado,
                       )),
-                  const Expanded(flex: 10, child: AreaPrincipal()),
+                  Expanded(
+                      flex: 10,
+                      child: AreaPrincipal(
+                        usuarioLogado: _usuarioLogado,
+                      )),
                 ],
               ))
         ],
@@ -154,17 +161,72 @@ class AreaLateral extends StatelessWidget {
 }
 
 class AreaPrincipal extends StatelessWidget {
-  const AreaPrincipal({Key? key}) : super(key: key);
+  final Usuario usuarioLogado;
+
+  const AreaPrincipal({Key? key, required this.usuarioLogado})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    Usuario? usuarioDest =
+        context.watch<ConversaProvider>().usuarioDestinatario;
+
     double largura = MediaQuery.of(context).size.width;
     double altura = MediaQuery.of(context).size.height;
-
-    return Container(
+    return usuarioDest != null
+        ? Column(
+            children: [
+              Container(
+                color: PaletaCores.corFundoBarra,
+                padding: const EdgeInsets.all(8),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 20,
+                      backgroundColor: Colors.grey,
+                      backgroundImage:
+                          CachedNetworkImageProvider(usuarioDest.urlImagem),
+                    ),
+                    const SizedBox(
+                      width: 8,
+                    ),
+                    Text(
+                      usuarioDest.nome,
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    const Spacer(),
+                    IconButton(
+                      onPressed: () {},
+                      icon: const Icon(Icons.search),
+                    ),
+                    IconButton(
+                      onPressed: () {},
+                      icon: const Icon(Icons.more_vert),
+                    ),
+                  ],
+                ),
+              ),
+              //Lista Mensagens
+              Expanded(
+                  child: ListaMensagens(
+                usuarioRemetente: usuarioLogado,
+                usuarioDestinatario: usuarioDest,
+              ))
+            ],
+          )
+        : Container(
+            height: altura,
+            width: largura,
+            color: PaletaCores.corFundoBarraClara,
+            child: const Center(
+                child: Text("Nenhum usuário selecionado no momento!")),
+          );
+    /*return Container(
       height: altura,
       width: largura,
       color: PaletaCores.corFundoBarraClara,
-    );
+      child: Text(
+          usuario != null ? usuario.nome : "Usuario ainda não selecionado!"),
+    );*/
   }
 }
